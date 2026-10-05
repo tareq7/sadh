@@ -12,7 +12,6 @@ cmd = [
     "--name", "Sadh",
     "--icon", str(root_dir / "assets" / "voxtype.ico"),
     "--add-data", f"{root_dir / 'assets'};assets",
-    "--add-data", f"{root_dir / 'config.json'};.",
     "--collect-all", "customtkinter",
     "--collect-all", "sounddevice",
     "--collect-all", "soundfile",
@@ -20,6 +19,13 @@ cmd = [
     "--clean",
     str(root_dir / "run.py")
 ]
+
+if (root_dir / "config.json.example").exists():
+    cmd.insert(8, "--add-data")
+    cmd.insert(9, f"{root_dir / 'config.json.example'};.")
+elif (root_dir / "config.json").exists():
+    cmd.insert(8, "--add-data")
+    cmd.insert(9, f"{root_dir / 'config.json'};.")
 
 print("[Build] Compiling Sadh standalone .exe with PyInstaller...")
 print("Command:", " ".join(cmd))

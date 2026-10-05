@@ -63,6 +63,9 @@ py-modules = [
     "run",
     "main",
     "audio_recorder",
+    "chat_correction",
+    "desktop_utils",
+    "dialect_prompts",
     "groq_transcriber",
     "hotkey_listener",
     "text_injector",
@@ -79,3 +82,7 @@ py-modules = [
 
 [tool.setuptools.package-data]
 "*" = ["assets/*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["."]
