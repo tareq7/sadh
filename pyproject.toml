@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sadh"
+version = "1.0.0"
+description = "Fast bilingual (Arabic/English) voice typing for Windows powered by Groq Whisper"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Tareq Naji" }
+]
+keywords = [
+    "voice-typing",
+    "speech-to-text",
+    "groq",
+    "whisper",
+    "arabic-nlp",
+    "dictation",
+    "windows-11",
+    "productivity"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Win32 (MS Windows)",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: Microsoft :: Windows :: Windows 11",
+    "Operating System :: Microsoft :: Windows :: Windows 10",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+    "Topic :: Utilities"
+]
+dependencies = [
+    "groq>=0.11.0",
+    "customtkinter>=5.2.0",
+    "sounddevice>=0.4.6",
+    "soundfile>=0.12.1",
+    "pystray>=0.19.5",
+    "Pillow>=10.0.0",
+    "pywin32>=306",
+    "numpy>=1.24.0",
+    "mss>=9.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/tareq7/sadh"
+Repository = "https://github.com/tareq7/sadh"
+Issues = "https://github.com/tareq7/sadh/issues"
+
+[project.scripts]
+sadh = "run:main"
+sadh-trigger = "trigger:main"
+
+[tool.setuptools]
+py-modules = [
+    "run",
+    "main",
+    "audio_recorder",
+    "groq_transcriber",
+    "hotkey_listener",
+    "text_injector",
+    "config_manager",
+    "tray_manager",
+    "settings_ui",
+    "ui_pill",
+    "startup_manager",
+    "screen_context",
+    "layered_surface",
+    "orb_visual",
+    "trigger"
+]
+
+[tool.setuptools.package-data]
+"*" = ["assets/*"]

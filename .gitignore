@@ -1,0 +1,45 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local configurations and credentials (NEVER COMMIT)
+config.json
+.env
+*.local
+credentials.json
+
+# Audio and temporary recordings
+*.wav
+*.flac
+*.mp3
+*.ogg
+*.m4a
+logs/
+*.log
+
+# PyInstaller / Build outputs
+build/
+dist/
+release_assets/
+release_dist/
+*.egg-info/
+*.spec
+*.exe
+*.dll
+*.pyd
+
+# Testing and IDE
+.pytest_cache/
+.coverage
+htmlcov/
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Shortcuts and backups
+*.lnk
+test_pythonw.txt
+review-backup-*/
+review_runtime_*.log

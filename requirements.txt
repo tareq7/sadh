@@ -1,0 +1,10 @@
+sounddevice>=0.5.0
+soundfile>=0.14.0
+pystray>=0.19.5
+pynput>=1.8.2
+httpx>=0.28.1
+langid==1.1.6
+pyperclip>=1.11.0
+numpy>=2.4.0
+Pillow>=11.3.0
+customtkinter>=5.2.2
