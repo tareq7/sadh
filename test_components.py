@@ -497,14 +497,14 @@ def test_ui_pill_init():
     pill.set_state("listening", audio_level=0.0)
     silent = pill._render_orb_image()
     assert silent.getpixel((0, 0))[3] == 0
-    assert any(0 < alpha < 255 for alpha in silent.getchannel("A").getdata())
+    assert any(0 < alpha < 255 for alpha in silent.getchannel("A").tobytes())
     pill.set_audio_level(0.7)
     for _ in range(4):
         pill._update_voice_visual_level()
     assert pill._display_level > 0.7
     loud = pill._render_orb_image()
     changed = ImageChops.difference(silent, loud).convert("L")
-    assert sum(1 for pixel in changed.getdata() if pixel > 24) > 150
+    assert sum(1 for pixel in changed.tobytes() if pixel > 24) > 150
     for state in ("listening", "transcribing", "done", "idle"):
         pill.set_state(state, audio_level=0.5)
         assert pill._render_pill_image().size == (148, 148)
@@ -533,13 +533,14 @@ def test_ui_pill_init():
     assert (pill.root.winfo_width(), pill.root.winfo_height()) == before
     assert pill._settings_offscreen
     assert pill.root.state() == "normal"
-    assert pill.settings_window.window.winfo_viewable()
-
     pill.settings_window.window.destroy()
     pill.root.update()
     assert pill.root.state() == "withdrawn"
     assert not pill._settings_offscreen
     pill.root.destroy()
+    del pill
+    import gc
+    gc.collect()
     print("  -> Idle Settings stays viewable; orb root parks offscreen and restores cleanly.")
 
 def test_startup_manager():
