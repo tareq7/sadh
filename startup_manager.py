@@ -37,7 +37,7 @@ def is_start_with_windows_enabled() -> bool:
 def set_start_with_windows(enable: bool) -> bool:
     """Enables or disables VoxType startup and removes the legacy Run value."""
     try:
-        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY, 0, winreg.KEY_SET_VALUE | winreg.KEY_QUERY_VALUE)
+        key = winreg.CreateKeyEx(winreg.HKEY_CURRENT_USER, RUN_KEY, 0, winreg.KEY_SET_VALUE | winreg.KEY_QUERY_VALUE)
         if enable:
             launcher_path = get_launcher_path()
             if getattr(sys, "frozen", False):
