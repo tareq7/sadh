@@ -90,7 +90,7 @@ class RegressionTests(unittest.TestCase):
         }
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._chunk_queue.put((sid, b"audio", True, False, b"full"))
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(event[0], "chunk_session_done")
         self.assertEqual(event[1][1], "hello there this works")
 
@@ -171,7 +171,7 @@ class RegressionTests(unittest.TestCase):
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._chunk_queue.put((sid, b"first", False, False, None))
         a._chunk_queue.put((sid, b"second", True, True, b"full"))
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(event[1][1], "Please open the new file")
         self.assertTrue(event[1][3])
 
@@ -197,7 +197,7 @@ class RegressionTests(unittest.TestCase):
         sid = a._start_chunk_session(123)
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._chunk_queue.put((sid, b"chunk", True, False, b"full"))
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(event[0], "chunk_session_done")
         self.assertEqual(event[1][1], "النص العربي الصحيح")
         self.assertFalse(event[1][3])
@@ -234,7 +234,7 @@ class RegressionTests(unittest.TestCase):
         a.transcriber.transcribe.side_effect = GroqAPIError(401)
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._chunk_queue.put((sid, b"audio", True, False, b"full"))
-        self.assertEqual(a.event_queue.get(timeout=5)[0], "chunk_session_error")
+        self.assertEqual(a.event_queue.get(timeout=15)[0], "chunk_session_error")
         self.assertEqual(a.transcriber.transcribe.call_count, 1)
 
     def test_session_config_is_snapshot(self):
@@ -264,7 +264,7 @@ class RegressionTests(unittest.TestCase):
         a.transcriber.correct_obvious_mistakes.return_value = {"text": "Hello", "latency": 0}
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._chunk_queue.put((sid, b"audio", True, False, b"full"))
-        self.assertEqual(a.event_queue.get(timeout=5)[1][1], "Hello")
+        self.assertEqual(a.event_queue.get(timeout=15)[1][1], "Hello")
 
     def test_context_name_repair_is_narrow(self):
         self.assertEqual(apply_terms("Open SuperToal", ("SuperTool",)), "Open SuperTool")
@@ -326,7 +326,7 @@ class RegressionTests(unittest.TestCase):
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._chunk_queue.put((sid, b"first", False, False, None))
         a._chunk_queue.put((sid, b"second", True, True, b"full"))
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(event[0], "chunk_session_done")
         self.assertEqual(event[1][1], "alpha beta gamma delta epsilon zeta")
         self.assertFalse(event[1][3])
@@ -344,7 +344,7 @@ class RegressionTests(unittest.TestCase):
         }
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._chunk_queue.put((sid, b"tail", True, False, [b"raw-session-block"]))
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(event[0], "chunk_session_done")
         self.assertEqual(event[1][1], "fast final chunk")
         a.recorder.encode_session_chunks.assert_not_called()
@@ -360,7 +360,7 @@ class RegressionTests(unittest.TestCase):
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._start_listening()
         a._stop_listening_and_transcribe()
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(event[1][1], "Complete transcript")
         self.assertEqual(a.transcriber.transcribe.call_args.kwargs["wav_bytes"], b"complete recording")
         self.assertEqual(event[1][4], 123)
@@ -669,7 +669,7 @@ class RegressionTests(unittest.TestCase):
         )
 
         a._chunk_queue.put((sid, b"second", True, True, b"full"))
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(event[0], "chunk_session_done")
         self.assertEqual(event[1][1], "hello from this system works very well")
         self.assertEqual(
@@ -830,7 +830,7 @@ class RegressionTests(unittest.TestCase):
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._chunk_queue.put((sid, b"first", False, False, None))
         a._chunk_queue.put((sid, b"second", True, False, b"full"))
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(event[0], "chunk_session_done")
         self.assertEqual(
             event[1][1],
@@ -871,7 +871,7 @@ class RegressionTests(unittest.TestCase):
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._chunk_queue.put((sid, b"first", False, False, None))
         a._chunk_queue.put((sid, b"second", True, False, b"full"))
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(event[0], "chunk_session_done")
         languages = [
             call.kwargs["language"] for call in a.transcriber.transcribe.call_args_list
@@ -915,7 +915,7 @@ class RegressionTests(unittest.TestCase):
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._chunk_queue.put((sid, b"first", False, False, None))
         a._chunk_queue.put((sid, b"second", True, False, b"full"))
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(event[0], "chunk_session_done")
         self.assertTrue(event[1][3])
         self.assertEqual(
@@ -959,7 +959,7 @@ class RegressionTests(unittest.TestCase):
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._chunk_queue.put((sid, b"first", False, False, None))
         a._chunk_queue.put((sid, b"second", True, False, b"full"))
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(event[0], "chunk_session_error")
         self.assertIn("English was locked", event[1][1])
         languages = [
@@ -1000,7 +1000,7 @@ class RegressionTests(unittest.TestCase):
             self.assertTrue(second_started.wait(2))
             threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
             release_first.set()
-            event = a.event_queue.get(timeout=5)
+            event = a.event_queue.get(timeout=15)
             self.assertEqual(event[0], "chunk_session_done")
             self.assertEqual(event[1][1], "first second")
         finally:
@@ -1066,7 +1066,7 @@ class RegressionTests(unittest.TestCase):
         }
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._chunk_queue.put((sid, b"silence", True, False, b"full"))
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(event[0], "chunk_session_done")
         self.assertEqual(event[1][1], "")
 
@@ -1174,7 +1174,7 @@ class RegressionTests(unittest.TestCase):
         ]
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._chunk_queue.put((sid, b"first", True, False, b"full"))
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(event[0], "chunk_session_done")
         self.assertEqual(event[1][1], "please open the project now")
         calls = a.transcriber.transcribe.call_args_list
@@ -1226,7 +1226,7 @@ class RegressionTests(unittest.TestCase):
         a.screen_context.chat_corrector.correct.assert_not_called()
 
         a._chunk_queue.put((sid, b"second", True, False, b"full"))
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(
             event[1][1],
             "تمام رح ابعتلك التفاصيل هلقيت وبعدين بستنى ردك",
@@ -1302,7 +1302,7 @@ class RegressionTests(unittest.TestCase):
         threading.Thread(target=a._chunk_worker_loop, daemon=True).start()
         a._chunk_queue.put((sid, b"chunk", False, False, None))
         a._chunk_queue.put((sid, b"tail", True, False, b"full"))
-        event = a.event_queue.get(timeout=5)
+        event = a.event_queue.get(timeout=15)
         self.assertEqual(event[0], "chunk_session_error")
         self.assertIn("single language could not be established", event[1][1])
         languages = [

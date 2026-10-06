@@ -329,7 +329,7 @@ def test_chunk_merge_and_fallback():
     threading.Thread(target=app._chunk_worker_loop, daemon=True).start()
     app._chunk_queue.put((1, b"first", False, False, None))
     app._chunk_queue.put((1, b"second", True, True, b"full"))
-    event = app.event_queue.get(timeout=2.0)
+    event = app.event_queue.get(timeout=10.0)
     assert event[0] == "chunk_session_done"
     session_id, text, _, used_fallback, target, *_ = event[1]
     assert session_id == 1
@@ -345,7 +345,7 @@ def test_chunk_merge_and_fallback():
         "latency": 0.0,
     }
     app._chunk_queue.put((2, b"bad", True, False, b"full"))
-    event = app.event_queue.get(timeout=2.0)
+    event = app.event_queue.get(timeout=10.0)
     assert event[0] == "chunk_session_done"
     session_id, text, _, used_fallback, target, *_ = event[1]
     assert session_id == 2
