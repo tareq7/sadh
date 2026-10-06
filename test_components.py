@@ -46,6 +46,7 @@ def test_dialect_prompts():
 def test_audio_recorder():
     print("[TEST 3] AudioRecorder capture + local silence gate...")
     recorder = AudioRecorder(sample_rate=16000)
+    wav_bytes = None
     try:
         recorder.start(play_cue=False)
         time.sleep(1.0)
@@ -67,7 +68,7 @@ def test_audio_recorder():
     voiced.audio_chunks = [tone]
     assert voiced.stop(play_cue=False, require_speech=True) is not None
 
-    print(f"  -> Capture passed ({len(wav_bytes)} bytes); silence rejected; one-shot audio preserved.")
+    print("  -> Capture passed; silence rejected; one-shot audio preserved.")
 
 def test_chunk_audio_retention():
     print("[TEST 4] Chunk buffer + full-session retention...")
