@@ -43,3 +43,28 @@ htmlcov/
 test_pythonw.txt
 review-backup-*/
 review_runtime_*.log
+
+# Virtual environments and local Python tooling
+.venv/
+venv/
+env/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+*.egg
+pip-wheel-metadata/
+coverage.xml
+
+# More local secrets (keep the documented example)
+.env.*
+!.env.example
+*.pem
+*.key
+
+# OS/editor scratch files
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
