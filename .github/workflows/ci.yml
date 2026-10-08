@@ -2,9 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main]
   pull_request:
-    branches: [ main, master ]
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -21,14 +24,31 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          cache: pip
 
-      - name: Install dependencies
+      - name: Install and validate package dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
+          python -m pip install -r requirements.txt pytest
+          python -m pip check
+
+      - name: Validate PowerShell installer syntax
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path ./install.ps1), [ref]$tokens, [ref]$errors)
+          if ($errors.Count -gt 0) { $errors | Format-List | Out-String | Write-Error; exit 1 }
 
       - name: Run test suite
+        run: python -m pytest -v
+
+      - name: Verify distributable wheel contains UI assets
+        if: matrix.python-version == '3.12'
+        shell: pwsh
         run: |
-          python -m pytest -v
+          python -m pip install build
+          python -m build --wheel
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -c "from pathlib import Path; from zipfile import ZipFile; w = next(Path('dist').glob('*.whl')); names = set(ZipFile(w).namelist()); expected = {'assets/voxtype.ico', 'assets/voxtype-icon.png'}; assert expected.issubset(names), f'Missing wheel assets: {expected - names}'"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

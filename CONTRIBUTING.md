@@ -18,8 +18,7 @@ We welcome contributions, bug fixes, dialect prompts, and improvements!
 
 3. Install dependencies:
    ```bash
-   pip install -r requirements.txt
-   pip install pytest
+   python -m pip install -r requirements.txt pytest
    ```
 
 4. Configure your environment:
@@ -30,7 +29,7 @@ We welcome contributions, bug fixes, dialect prompts, and improvements!
 
 5. Run the test suite:
    ```bash
-   pytest -v
+   python -m pytest -v
    ```
 
 6. Start in development mode:
@@ -43,4 +42,7 @@ We welcome contributions, bug fixes, dialect prompts, and improvements!
 - Keep pull requests focused on a single feature or bug fix.
 - Ensure all tests pass (`pytest -v`) before opening a PR.
 - Preserve zero focus theft (`WS_EX_NOACTIVATE`) when modifying UI code.
+- Declare runtime dependencies in `pyproject.toml` only; `requirements.txt` installs the project so the two lists cannot drift.
 - Avoid introducing external runtime dependencies unless necessary.
+- Do not package user configuration files, API keys, recordings, or runtime logs.
+- Update release-tool tests when changing `build_exe.py` or console entry points.

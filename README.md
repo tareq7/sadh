@@ -21,23 +21,17 @@
 
 **Sadh (صَدْح)** — Arabic for a clear, loud, resonant vocal utterance — is a lightweight Windows voice typing companion designed to fix the chronic issues of native speech typing:
 
-- **Sub-second latency**: Audio streams through Groq's LPUs running `whisper-large-v3-turbo` in under 600 ms.
+- **Responsive dictation**: Uses Groq's hosted Whisper models; responsiveness varies with speech duration, network conditions, and service load.
 - **Accurate bilingual support**: Transcribes Modern Standard Arabic, regional dialects (Levantine, Egyptian, Gulf), and English without cross-translation or garbled transliteration.
 - **Zero focus theft**: Uses a native Win32 `WS_EX_NOACTIVATE` floating overlay. You never lose cursor focus, active text fields, or command prompt carets while speaking.
 - **Native hotkey integration**: Intercepts `Win + H` cleanly without triggering Windows Speech error dialogs.
-- **Zero local GPU load**: Runs on any laptop or desktop with minimal RAM usage (~45 MB) and 0% GPU utilization.
+- **No local Whisper GPU required**: Speech recognition runs remotely, while local microphone capture, UI and text insertion use CPU and memory.
 
 ---
 
-## Benchmark Comparison
+## Performance notes
 
-| Metric | Windows Native (`Win + H`) | Local Whisper (`large-v3`) | **Sadh (Groq Whisper)** |
-| :--- | :--- | :--- | :--- |
-| **Response Latency** | 3.5s – 6.0s (laggy) | 2.0s – 8.0s (GPU dependent) | **~500ms – 800ms** |
-| **Arabic & Dialects** | Poor (drops colloquial phrasing) | Good (slow on CPU) | **Superior (context-primed)** |
-| **Hardware Overhead** | Background telemetry services | 2 – 5 GB VRAM, high fan noise | **~45 MB RAM, 0% GPU** |
-| **Focus Handling** | Steals input focus | N/A (CLI tools) | **Zero focus theft (`WS_EX_NOACTIVATE`)** |
-| **Setup** | Tied to Windows Language Packs | Requires CUDA / C++ toolchains | **Single standalone `.exe`** |
+Sadh uses remote speech recognition rather than a local GPU model. End-to-end latency and accuracy depend on microphone quality, internet connection, API model availability, and the speech itself. The project does not publish reproducible comparative benchmarks; claims of fixed latency, memory use, or superiority over other engines should not be inferred.
 
 ---
 
@@ -51,7 +45,7 @@ Open PowerShell and paste:
 irm https://raw.githubusercontent.com/tareq7/sadh/main/install.ps1 | iex
 ```
 
-This downloads `Sadh.exe` to `%LOCALAPPDATA%\Sadh`, creates a Desktop shortcut, registers optional Windows startup, and launches the app.
+The installer downloads a release binary and its SHA-256 checksum manifest, verifies the binary before replacing any existing installation, creates a Desktop shortcut, and launches the app. Review the remote script before running it. Close any existing Sadh process before upgrading.
 
 ---
 
@@ -169,15 +163,15 @@ Key options can be changed through the visual Settings window (accessible via sy
 
 | File | Responsibility |
 | :--- | :--- |
-| [`main.py`](file:///C:/Users/Tareq%20Naji/.gemini/antigravity/scratch/win-voice-groq/main.py) | Application coordinator, state machine, event loop, and IPC server |
-| [`audio_recorder.py`](file:///C:/Users/Tareq%20Naji/.gemini/antigravity/scratch/win-voice-groq/audio_recorder.py) | 16 kHz mono PortAudio capture, ring buffer, dynamic VAD chunking |
-| [`groq_transcriber.py`](file:///C:/Users/Tareq%20Naji/.gemini/antigravity/scratch/win-voice-groq/groq_transcriber.py) | Groq Whisper client, dialect prompts, retry backoff, response filtering |
-| [`hotkey_listener.py`](file:///C:/Users/Tareq%20Naji/.gemini/antigravity/scratch/win-voice-groq/hotkey_listener.py) | Low-level Win32 keyboard hook (`WH_KEYBOARD_LL`), key masking |
-| [`text_injector.py`](file:///C:/Users/Tareq%20Naji/.gemini/antigravity/scratch/win-voice-groq/text_injector.py) | Target HWND focus verification, Unicode `SendInput`, clipboard safety |
-| [`ui_pill.py`](file:///C:/Users/Tareq%20Naji/.gemini/antigravity/scratch/win-voice-groq/ui_pill.py) | Floating non-activating indicator pill (`WS_EX_NOACTIVATE`) |
-| [`startup_manager.py`](file:///C:/Users/Tareq%20Naji/.gemini/antigravity/scratch/win-voice-groq/startup_manager.py) | Windows Run registry (`HKCU\...\Run`) persistence and migration |
-| [`settings_ui.py`](file:///C:/Users/Tareq%20Naji/.gemini/antigravity/scratch/win-voice-groq/settings_ui.py) | CustomTkinter dark-mode settings panel |
-| [`trigger.py`](file:///C:/Users/Tareq%20Naji/.gemini/antigravity/scratch/win-voice-groq/trigger.py) | CLI trigger utility communicating over local TCP socket |
+| [`main.py`](main.py) | Application coordinator, state machine, event loop, and IPC server |
+| [`audio_recorder.py`](audio_recorder.py) | 16 kHz mono PortAudio capture, ring buffer, dynamic VAD chunking |
+| [`groq_transcriber.py`](groq_transcriber.py) | Groq Whisper client, dialect prompts, retry backoff, response filtering |
+| [`hotkey_listener.py`](hotkey_listener.py) | Low-level Win32 keyboard hook (`WH_KEYBOARD_LL`), key masking |
+| [`text_injector.py`](text_injector.py) | Target HWND focus verification, Unicode `SendInput`, clipboard safety |
+| [`ui_pill.py`](ui_pill.py) | Floating non-activating indicator pill (`WS_EX_NOACTIVATE`) |
+| [`startup_manager.py`](startup_manager.py) | Windows Run registry (`HKCU\...\Run`) persistence and migration |
+| [`settings_ui.py`](settings_ui.py) | CustomTkinter dark-mode settings panel |
+| [`trigger.py`](trigger.py) | CLI trigger utility communicating over local TCP socket |
 
 ---
 
@@ -196,21 +190,26 @@ Tests cover hotkey race conditions, cancellation timeouts, chunk deduplication, 
 
 ## Building Standalone Binary
 
-To build `Sadh.exe` locally with PyInstaller:
+Builds require Windows, Python 3.10–3.12 and PyInstaller:
 
-```bash
+```powershell
+python -m pip install -r requirements.txt pyinstaller
 python build_exe.py
 ```
 
-The resulting single-file binary is placed in `dist\Sadh.exe`.
+The build writes `dist\\Sadh.exe`. It packages application assets but **never** bundles a local `config.json`, `.env`, or API key. Releases are built and checked on GitHub Actions.
 
 ---
 
 ## Privacy & Security
 
-- **No Local Logging of Transcripts**: Transcribed text goes directly to your active text cursor. It is never written to disk logs.
-- **Direct Groq Connection**: All network traffic is sent directly to `api.groq.com` over TLS 1.3. No intermediate proxies or telemetry servers exist.
-- **Local Credentials**: Your Groq API key is stored locally in your own `config.json` file.
+- **Groq cloud transcription:** Microphone audio is sent over HTTPS to Groq for recognition. The service is not offline or entirely local.
+- **Optional screen context:** When explicitly enabled in Settings, Sadh may capture a crop of the active window and send it to Groq to improve recognition/correction. This is disabled by default. Avoid enabling it while confidential material is visible.
+- **Diagnostics:** Runtime diagnostics are written to a rotating `logs/runtime.log` file. The application does not intentionally log full transcripts, but exception details may contain sensitive information; inspect logs before sharing them.
+- **Credentials:** The Groq key is read from the local `config.json`, `.env`, or `GROQ_API_KEY` environment variable. Never commit those files or include them in issue reports. Keep the installation directory private.
+- **Local hotkeys and clipboard:** Windows keyboard hooks and clipboard operations are used to insert the transcript at the focused cursor; the clipboard may temporarily contain dictated text.
+
+See [SECURITY.md](SECURITY.md) for vulnerability reporting.
 
 ---
 
