@@ -7,11 +7,6 @@ from difflib import SequenceMatcher
 import httpx
 from langid.langid import LanguageIdentifier, model as LANGID_MODEL
 
-try:
-    from .dialect_prompts import get_dialect_prompt
-except ImportError:
-    from dialect_prompts import get_dialect_prompt
-
 GROQ_TRANSCRIPTION_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
 GROQ_MODELS_URL = "https://api.groq.com/openai/v1/models"
 
