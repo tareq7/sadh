@@ -61,6 +61,7 @@ sadh = "run:main"
 sadh-trigger = "trigger:main"
 
 [tool.setuptools]
+packages = ["assets"]
 py-modules = [
     "run",
     "main",
@@ -83,7 +84,7 @@ py-modules = [
 ]
 
 [tool.setuptools.package-data]
-"*" = ["assets/*"]
+assets = ["*.ico", "*.png"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

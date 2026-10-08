@@ -7,7 +7,7 @@ Security fixes are targeted at the latest release on the `main` branch.
 ## Private vulnerability reporting
 
 Do not publish credentials, transcripts, or security findings in a public issue.
-Use [GitHub's private vulnerability reporting](https://github.com/tareq7/sadh/security/advisories/new), if enabled, or contact the maintainer using the address in the repository's existing security policy.
+Use [GitHub's private vulnerability reporting](https://github.com/tareq7/sadh/security/advisories/new), if enabled, or email the maintainer at `najetareqz@gmail.com`.
 
 ## Data handling and trust boundaries
 
