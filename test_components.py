@@ -12,13 +12,11 @@ if str(root_dir) not in sys.path:
 
 try:
     from .config_manager import ConfigManager
-    from .dialect_prompts import get_dialect_prompt
     from .audio_recorder import AudioRecorder
     from .text_injector import TextInjector
     from .groq_transcriber import GroqTranscriber
 except ImportError:
     from config_manager import ConfigManager
-    from dialect_prompts import get_dialect_prompt
     from audio_recorder import AudioRecorder
     from text_injector import TextInjector
     from groq_transcriber import GroqTranscriber
@@ -36,12 +34,13 @@ def test_config():
     assert 550 <= cfg.get("chunk_overlap_ms") <= 800
     print("  -> ConfigManager passed!")
 
-def test_dialect_prompts():
-    print("[TEST 2] Dialect Prompts testing...")
-    prompt_gz = get_dialect_prompt("gazan")
-    assert "هلقيت" in prompt_gz
-    assert "بدي" in prompt_gz
-    print("  -> Gazan prompt verification passed!")
+def test_whisper_prompt_safety():
+    print("[TEST 2] Whisper prompt safety...")
+    # Auto language detection must never be biased by a regional phrase list.
+    assert GroqTranscriber._build_prompt("auto", "gazan", "Example name") == ""
+    assert GroqTranscriber._build_prompt("ar", "gazan") == ""
+    assert GroqTranscriber._build_prompt("ar", "gazan", "  User term  ") == "User term"
+    print("  -> Auto language and explicit prompt safeguards passed!")
 
 def test_audio_recorder():
     print("[TEST 3] AudioRecorder capture + local silence gate...")
@@ -573,7 +572,7 @@ def test_tray_icon():
 if __name__ == "__main__":
     print("=== RUNNING SADH STANDALONE COMPONENT TESTS ===")
     test_config()
-    test_dialect_prompts()
+    test_whisper_prompt_safety()
     test_audio_recorder()
     test_chunk_audio_retention()
     test_audio_silence_gate()

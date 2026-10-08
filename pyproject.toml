@@ -68,7 +68,6 @@ py-modules = [
     "audio_recorder",
     "chat_correction",
     "desktop_utils",
-    "dialect_prompts",
     "groq_transcriber",
     "hotkey_listener",
     "text_injector",
